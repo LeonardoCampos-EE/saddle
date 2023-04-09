@@ -2,8 +2,8 @@ from ..core.base import BaseMetaheuristicOptimizer
 
 
 class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
-    def populate(self) -> None:
-        return super().populate()
+    def populate(self, size: int) -> None:
+        return super().populate(size)
 
     def optimize(self) -> None:
         return super().optimize()

@@ -2,8 +2,8 @@ from ..core.base import BaseMetaheuristicOptimizer
 
 
 class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
-    def populate(self) -> None:
-        return super().populate()
+    def populate(self, *args, **kwagrs) -> None:
+        return super().populate(*args, **kwagrs)
 
     def optimize(self) -> None:
         return super().optimize()

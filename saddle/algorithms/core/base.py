@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Callable, Any
+import numpy as np
 import polars as pl
 
 from ...types import ArrayLike
-from ...functions.converters import convert_to_series
+from ...functions.converters import convert_bounds_to_dataframe
 
 
 class BaseOptimizer(ABC):
@@ -19,12 +20,8 @@ class BaseOptimizer(ABC):
     ) -> None:
         self.columns = columns
         self.schema = {col: pl.Float32 for col in self.columns}
-        self.upper_bounds = pl.DataFrame(
-            convert_to_series(upper_bounds), schema=self.schema
-        )
-        self.lower_bounds = pl.DataFrame(
-            convert_to_series(lower_bounds), schema=self.schema
-        )
+        self.upper_bounds = convert_bounds_to_dataframe(upper_bounds, self.columns)
+        self.lower_bounds = convert_bounds_to_dataframe(lower_bounds, self.columns)
 
     @abstractmethod
     def update(self) -> None:
@@ -44,10 +41,16 @@ class BaseOptimizer(ABC):
 class BaseMetaheuristicOptimizer(BaseOptimizer):
     population: pl.DataFrame | None = None
 
-    def populate(self) -> None:
+    def populate(self, size: int) -> None:
         """
         Initialize the population
         """
-        population = pl.DataFrame(schema=self.schema)
+
+        upp = self.upper_bounds.to_numpy()
+        low = self.lower_bounds.to_numpy()
+        population = pl.DataFrame(
+            (upp - low) * np.random.uniform(size=(size, len(self.columns))) + low,
+            schema=self.schema,
+        )
 
         self.population = population
