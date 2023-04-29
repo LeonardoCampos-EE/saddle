@@ -1,30 +1,35 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable
 import numpy as np
-import polars as pl
+import pandas as pd
 
 from ...types import ArrayLike
 from ...functions.converters import convert_bounds_to_dataframe
 
 
 class BaseOptimizer(ABC):
-    fn_obj: Callable | None = None
-    fn_res: dict[str, Callable] | list[Callable] | None = None
-    columns: list[str]
-    schema: dict[str, Any]
-    upper_bounds: pl.DataFrame
-    lower_bounds: pl.DataFrame
+    fn_obj: Callable
+    variables: list[str]
+    upper_bounds: pd.DataFrame
+    lower_bounds: pd.DataFrame
+    iterations: int
 
     def __init__(
-        self, columns: list[str], upper_bounds: ArrayLike, lower_bounds: ArrayLike
+        self,
+        variables: list[str],
+        upper_bounds: ArrayLike,
+        lower_bounds: ArrayLike,
+        iterations: int,
     ) -> None:
-        self.columns = columns
-        self.schema = {col: pl.Float32 for col in self.columns}
-        self.upper_bounds = convert_bounds_to_dataframe(upper_bounds, self.columns)
-        self.lower_bounds = convert_bounds_to_dataframe(lower_bounds, self.columns)
+        self.variables = variables
+        self.columns = self.variables + ['fn_obj']
+
+        self.upper_bounds = convert_bounds_to_dataframe(upper_bounds, self.variables)
+        self.lower_bounds = convert_bounds_to_dataframe(lower_bounds, self.variables)
+        self.iterations = iterations
 
     @abstractmethod
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         """
         Updates the algorithm's position on each iteration
         """
@@ -39,18 +44,36 @@ class BaseOptimizer(ABC):
 
 
 class BaseMetaheuristicOptimizer(BaseOptimizer):
-    population: pl.DataFrame | None = None
+    population: pd.DataFrame = pd.DataFrame()
+    seed: int
+
+    def __init__(
+        self,
+        variables: list[str],
+        upper_bounds: ArrayLike,
+        lower_bounds: ArrayLike,
+        iterations: int,
+        seed: int = 42,
+    ) -> None:
+        self.seed = seed
+        super().__init__(variables, upper_bounds, lower_bounds, iterations=iterations)
 
     def populate(self, size: int) -> None:
         """
         Initialize the population
         """
-
+        self.size = size
         upp = self.upper_bounds.to_numpy()
         low = self.lower_bounds.to_numpy()
-        population = pl.DataFrame(
-            (upp - low) * np.random.uniform(size=(size, len(self.columns))) + low,
-            schema=self.schema,
-        )
+        population: np.ndarray = (upp - low) * np.random.uniform(
+            size=(size, len(self.variables))
+        ) + low
 
-        self.population = population
+        fn_obj = np.zeros(shape=(size, 1))
+        population = np.hstack([population, fn_obj])
+
+        self.population = pd.DataFrame(population)
+
+    def calc_fn_obj(self) -> None:
+        fn_values: pd.Series = self.fn_obj(self.population.loc[:, self.variables])
+        self.population.loc[:, -1] = fn_values

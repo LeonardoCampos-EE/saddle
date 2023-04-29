@@ -1,5 +1,5 @@
 from typing import TypeVar
-import polars as pl
+import pandas as pd
 import numpy as np
 
-ArrayLike = TypeVar('ArrayLike', pl.Series, np.ndarray, list)
+ArrayLike = TypeVar('ArrayLike', pd.Series, np.ndarray, list)

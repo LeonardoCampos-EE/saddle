@@ -1,18 +1,18 @@
 from ..types import ArrayLike
 import numpy as np
-import polars as pl
+import pandas as pd
 
 
-def convert_to_series(obj: ArrayLike) -> pl.Series:
+def convert_to_series(obj: ArrayLike) -> pd.Series:
     match obj:
-        case pl.Series():
+        case pd.Series():
             return obj
         case np.ndarray():
-            return pl.Series(obj)
+            return pd.Series(obj)
         case _:
-            return pl.Series(obj)
+            return pd.Series(obj)
 
 
-def convert_bounds_to_dataframe(obj: ArrayLike, columns: list[str]) -> pl.DataFrame:
+def convert_bounds_to_dataframe(obj: ArrayLike, columns: list[str]) -> pd.DataFrame:
     assert len(obj) == len(columns)
-    return pl.DataFrame(dict(zip(columns, obj)))
+    return pd.DataFrame(dict(zip(columns, obj)))
