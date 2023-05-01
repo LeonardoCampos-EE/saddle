@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from ..core.base import BaseMetaheuristicOptimizer
+from ...functions.utils import clip_dataframe
 
 
 class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
@@ -17,21 +18,21 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         self.a = 2 - (iter_array * (2.0 / self.iterations))
 
         # r1 and r2 -> random numbers between 0 and 1
-        # shape -> (iterations, variables, size)
+        # shape -> (iterations, size, variables)
         self.r1 = np.random.random_sample(
-            size=(self.iterations, len(self.variables), self.size)
+            size=(self.iterations, self.size, len(self.variables))
         )
         self.r2 = np.random.random_sample(
-            size=(self.iterations, len(self.variables), self.size)
+            size=(self.iterations, self.size, len(self.variables))
         )
 
         # A(t) -> controls the step size of each wolf in the search space
-        # shape -> (iterations, variables, size)
+        # shape -> (iterations, size, variables)
         a = self.a[:, np.newaxis, np.newaxis]
         self.A = (2 * a * self.r1) - a
 
         # C(t) -> controls the movement of each wolf towards the best solutions
-        # shape -> (iterations, variables, size)
+        # shape -> (iterations, size, variables)
         self.C = 2 * self.r2
 
     def optimize(self) -> None:
@@ -40,11 +41,11 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             A = self.A[t]
             C = self.C[t]
 
-            self.calc_fn_obj()
-            self.population = self.population.sort(by='fn_obj')
-            alpha = self.population.iloc[0]
-            beta = self.population.iloc[1]
-            delta = self.population.iloc[2]
+            self.calculate_metric()
+            best_indexes = self.population['metric'].argsort()
+            alpha = self.population.loc[best_indexes[0], self.variables].to_numpy()
+            beta = self.population.loc[best_indexes[1], self.variables].to_numpy()
+            delta = self.population.loc[best_indexes[2], self.variables].to_numpy()
 
             self.update(A, C, alpha, beta, delta)
 
@@ -59,17 +60,20 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         # Calculate D_alpha, D_beta, D_delta
         population = self.population.loc[:, self.variables]
 
-        D_alpha = (alpha * C - population).abs()
-        D_beta = (beta * C - population).abs()
-        D_delta = (delta * C - population).abs()
+        D_alpha = np.abs(np.multiply(C, alpha) - population)
+        D_beta = np.abs(np.multiply(C, beta) - population)
+        D_delta = np.abs(np.multiply(C, delta) - population)
 
         # Calculate X_alpha, X_beta, X_delta
-        X_alpha = alpha - (A * D_alpha)
-        X_beta = beta - (A * D_beta)
-        X_delta = delta - (A * D_delta)
+        X_alpha = alpha - np.multiply(A, D_alpha)
+        X_beta = beta - np.multiply(A, D_beta)
+        X_delta = delta - np.multiply(A, D_delta)
 
         # Update population
         population = (X_alpha + X_beta + X_delta) / 3.0
 
-        self.population[:, self.variables] = population
+        population = clip_dataframe(
+            population, upper=self.upper_bounds, lower=self.lower_bounds
+        )
+        self.population.loc[:, self.variables] = population
         return

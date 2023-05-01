@@ -13,6 +13,6 @@ def convert_to_series(obj: ArrayLike) -> pd.Series:
             return pd.Series(obj)
 
 
-def convert_bounds_to_dataframe(obj: ArrayLike, columns: list[str]) -> pd.DataFrame:
+def convert_bounds_to_series(obj: ArrayLike, columns: list[str]) -> pd.DataFrame:
     assert len(obj) == len(columns)
-    return pd.DataFrame(dict(zip(columns, obj)))
+    return pd.Series(obj, index=columns)

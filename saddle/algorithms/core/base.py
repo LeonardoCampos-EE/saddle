@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 
 from ...types import ArrayLike
-from ...functions.converters import convert_bounds_to_dataframe
+from ...functions.converters import convert_bounds_to_series
 
 
 class BaseOptimizer(ABC):
     fn_obj: Callable
     variables: list[str]
-    upper_bounds: pd.DataFrame
-    lower_bounds: pd.DataFrame
+    upper_bounds: pd.Series
+    lower_bounds: pd.Series
     iterations: int
 
     def __init__(
@@ -20,13 +20,15 @@ class BaseOptimizer(ABC):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
+        fn_obj: Callable,
     ) -> None:
         self.variables = variables
-        self.columns = self.variables + ['fn_obj']
+        self.columns = self.variables + ['fn_obj', 'metric']
 
-        self.upper_bounds = convert_bounds_to_dataframe(upper_bounds, self.variables)
-        self.lower_bounds = convert_bounds_to_dataframe(lower_bounds, self.variables)
+        self.upper_bounds = convert_bounds_to_series(upper_bounds, self.variables)
+        self.lower_bounds = convert_bounds_to_series(lower_bounds, self.variables)
         self.iterations = iterations
+        self.fn_obj = fn_obj
 
     @abstractmethod
     def update(self, *args, **kwargs) -> None:
@@ -53,10 +55,12 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
+        fn_obj: Callable,
         seed: int = 42,
     ) -> None:
         self.seed = seed
-        super().__init__(variables, upper_bounds, lower_bounds, iterations=iterations)
+        np.random.seed(self.seed)
+        super().__init__(variables, upper_bounds, lower_bounds, iterations, fn_obj)
 
     def populate(self, size: int) -> None:
         """
@@ -70,10 +74,14 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         ) + low
 
         fn_obj = np.zeros(shape=(size, 1))
-        population = np.hstack([population, fn_obj])
+        population = np.hstack([population, fn_obj, fn_obj])
 
-        self.population = pd.DataFrame(population)
+        self.population = pd.DataFrame(population, columns=self.columns)
 
-    def calc_fn_obj(self) -> None:
+    def _calculate_fn_obj(self) -> None:
         fn_values: pd.Series = self.fn_obj(self.population.loc[:, self.variables])
-        self.population.loc[:, -1] = fn_values
+        self.population.loc[:, 'fn_obj'] = fn_values
+
+    def calculate_metric(self) -> None:
+        self._calculate_fn_obj()
+        self.population.loc[:, 'metric'] = self.population.loc[:, 'fn_obj']
