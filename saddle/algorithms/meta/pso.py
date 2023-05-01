@@ -1,5 +1,4 @@
 from ..core.base import BaseMetaheuristicOptimizer
-from typing import Callable
 from ...types import ArrayLike
 import numpy as np
 import pandas as pd
@@ -20,7 +19,7 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
-        fn_obj: Callable,
+        fn_obj: callable,
         seed: int = 42,
         w: float = 0.8,
         c1: float = 0.1,
@@ -50,11 +49,11 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
 
         # P best -> best historical points for the whole population
         self.p_best = self.population.copy()
-        self.p_best.loc[:, 'metric'] = np.inf
+        self.p_best.loc[:, "metric"] = np.inf
 
         # G best -> best solution so far
         self.g_best = self.population.loc[[0], :].copy()
-        self.g_best.loc[:, 'metric'] = np.inf
+        self.g_best.loc[:, "metric"] = np.inf
 
     def optimize(self) -> None:
         for t in range(self.iterations):
@@ -62,16 +61,16 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
             self.calculate_metric()
             self._get_p_best()
             # Get the index of the best member of the population
-            best_index = self.population['metric'].argsort()[0]
+            best_index = self.population["metric"].argsort()[0]
             self._get_g_best(best_index=best_index)
             self.update(t=t)
 
     def _get_p_best(self) -> None:
         # Current population metric
-        pop_metric = self.population.loc[:, 'metric'].to_numpy()
+        pop_metric = self.population.loc[:, "metric"].to_numpy()
 
         # P best metric
-        p_best_metric = self.p_best.loc[:, 'metric'].to_numpy()
+        p_best_metric = self.p_best.loc[:, "metric"].to_numpy()
 
         mask = pop_metric < p_best_metric
 
@@ -80,7 +79,7 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
 
     def _get_g_best(self, best_index: int) -> None:
         best = self.population.iloc[[best_index]]
-        if best['metric'].iloc[0] < self.g_best['metric'].iloc[0]:
+        if best["metric"].iloc[0] < self.g_best["metric"].iloc[0]:
             self.g_best = best.reset_index(drop=True)
 
     def update(self, t: int) -> None:

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Callable
 import numpy as np
 import pandas as pd
 
@@ -8,7 +7,7 @@ from ...functions.converters import convert_bounds_to_series
 
 
 class BaseOptimizer(ABC):
-    fn_obj: Callable
+    fn_obj: callable
     variables: list[str]
     upper_bounds: pd.Series
     lower_bounds: pd.Series
@@ -20,7 +19,7 @@ class BaseOptimizer(ABC):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
-        fn_obj: Callable,
+        fn_obj: callable,
     ) -> None:
         self.variables = variables
         self.columns = self.variables + ['fn_obj', 'metric']
@@ -55,7 +54,7 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
-        fn_obj: Callable,
+        fn_obj: callable,
         seed: int = 42,
     ) -> None:
         self.seed = seed
