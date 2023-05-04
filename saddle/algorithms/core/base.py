@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
+from matplotlib.figure import Figure
 
 from ...types import ArrayLike
 from ...functions.converters import convert_bounds_to_series
@@ -84,3 +85,6 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
     def calculate_metric(self) -> None:
         self._calculate_fn_obj()
         self.population.loc[:, 'metric'] = self.population.loc[:, 'fn_obj']
+
+    def plot_contours(self, optima: list[float]) -> Figure:
+        raise NotImplementedError
