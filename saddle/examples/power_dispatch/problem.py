@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 from saddle.types import ParametricFunction
 from dataclasses import dataclass
 from .functions import (
@@ -8,6 +9,8 @@ from .functions import (
     min_power_constraint,
     max_power_constraint,
 )
+
+PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 @dataclass
@@ -36,7 +39,7 @@ class DispatchProblem:
 class ThreeGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            'systems/3_gen.csv',
+            os.path.join(PATH, 'systems', '3_gen.csv'),
             dtype=np.float32,
         )
         self.variables = [f'p{i}' for i in range(1, 4)]
@@ -47,7 +50,7 @@ class ThreeGenerators(DispatchProblem):
 class ThirteenGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            'systems/13_gen.csv',
+            os.path.join(PATH, 'systems', '13_gen.csv'),
             dtype=np.float32,
         )
         self.variables = [f'p{i}' for i in range(1, 14)]
@@ -58,7 +61,7 @@ class ThirteenGenerators(DispatchProblem):
 class NineteenGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            'systems/19_gen.csv',
+            os.path.join(PATH, 'systems', '19_gen.csv'),
             dtype=np.float32,
         )
         self.variables = [f'p{i}' for i in range(1, 20)]
@@ -69,7 +72,7 @@ class NineteenGenerators(DispatchProblem):
 class FortyGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            'systems/40_gen.csv',
+            os.path.join(PATH, 'systems', '3_gen.csv'),
             dtype=np.float32,
         )
         self.variables = [f'p{i}' for i in range(1, 41)]
