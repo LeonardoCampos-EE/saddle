@@ -72,8 +72,9 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         # Update population
         population = (X_alpha + X_beta + X_delta) / 3.0
 
-        population = clip_dataframe(
-            population, upper=self.upper_bounds, lower=self.lower_bounds
-        )
+        if not self.constraints:
+            population = clip_dataframe(
+                population, upper=self.upper_bounds, lower=self.lower_bounds
+            )
         self.population.loc[:, self.variables] = population
         return

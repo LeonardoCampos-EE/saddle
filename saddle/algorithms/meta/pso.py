@@ -127,11 +127,12 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
         self._update_history(t)
         self._update_population()
 
-        self.population.loc[:, self.variables] = clip_dataframe(
-            self.population.loc[:, self.variables],
-            upper=self.upper_bounds,
-            lower=self.lower_bounds,
-        )
+        if not self.constraints:
+            self.population.loc[:, self.variables] = clip_dataframe(
+                self.population.loc[:, self.variables],
+                upper=self.upper_bounds,
+                lower=self.lower_bounds,
+            )
 
     def _update_velocity(self, t: int) -> None:
         p_best = self.p_best.loc[:, self.variables].to_numpy()
@@ -155,14 +156,6 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
             optima=optima,
         )
 
-        gbest_plot = ax.scatter(
-            x=self.g_best_history[self.variables[0]].iloc[0],
-            y=self.g_best_history[self.variables[1]].iloc[0],
-            c='red',
-            marker='x',
-            s=10,
-            label='G Best',
-        )
         pop = self.population_history.loc[self.population_history['iteration'] == 0][
             self.variables
         ].to_numpy()
@@ -185,6 +178,14 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
             angles='xy',
             scale_units='xy',
             scale=1,
+        )
+        gbest_plot = ax.scatter(
+            x=self.g_best_history[self.variables[0]].iloc[0],
+            y=self.g_best_history[self.variables[1]].iloc[0],
+            c='red',
+            marker='x',
+            s=12,
+            label='G Best',
         )
 
         def animate(i):
