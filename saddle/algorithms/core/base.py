@@ -22,9 +22,13 @@ class BaseOptimizer(ABC):
         lower_bounds: ArrayLike,
         iterations: int,
         fn_obj: Callable | ParametricFunction,
+        constraints: dict[str, Callable | ParametricFunction] | None = None,
     ) -> None:
         self.variables = variables
-        self.columns = self.variables + ['fn_obj', 'metric']
+        self.constraints = constraints or {}
+        self.columns = (
+            self.variables + ['fn_obj'] + list(self.constraints.keys()) + ['metric']
+        )
 
         self.upper_bounds = convert_bounds_to_series(upper_bounds, self.variables)
         self.lower_bounds = convert_bounds_to_series(lower_bounds, self.variables)
@@ -56,12 +60,18 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
+        size: int,
         fn_obj: Callable | ParametricFunction,
+        constraints: dict[str, Callable | ParametricFunction] | None = None,
         seed: int = 42,
     ) -> None:
         self.seed = seed
+        self.size = size
         np.random.seed(self.seed)
-        super().__init__(variables, upper_bounds, lower_bounds, iterations, fn_obj)
+        super().__init__(
+            variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints
+        )
+        self.populate(self.size)
 
     def populate(self, size: int) -> None:
         """
@@ -83,9 +93,19 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         fn_values: pd.Series = self.fn_obj(self.population.loc[:, self.variables])
         self.population.loc[:, 'fn_obj'] = fn_values
 
+    def _calculate_constraints(self) -> None:
+        for name, constraint in self.constraints.items():
+            constraint_values: pd.Series = constraint(
+                self.population.loc[:, self.variables]
+            )
+            self.population.loc[:, name] = constraint_values
+
     def calculate_metric(self) -> None:
         self._calculate_fn_obj()
-        self.population.loc[:, 'metric'] = self.population.loc[:, 'fn_obj']
+        metric = self.population.loc[:, ['fn_obj'] + list(self.constraints.keys())].sum(
+            axis=1
+        )
+        self.population.loc[:, 'metric'] = metric
 
     def plot_contours(self, optima: list[float]) -> Figure:
         raise NotImplementedError

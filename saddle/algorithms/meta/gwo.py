@@ -1,27 +1,10 @@
-from typing import Callable
 import numpy as np
 import pandas as pd
 from ..core.base import BaseMetaheuristicOptimizer
 from ...functions.utils import clip_dataframe
-from ...types import ArrayLike, ParametricFunction
 
 
 class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
-    def __init__(
-        self,
-        variables: list[str],
-        upper_bounds: ArrayLike,
-        lower_bounds: ArrayLike,
-        iterations: int,
-        fn_obj: Callable | ParametricFunction,
-        seed: int = 42,
-        size: int = 12,
-    ) -> None:
-        super().__init__(
-            variables, upper_bounds, lower_bounds, iterations, fn_obj, seed
-        )
-        self.populate(size=size)
-
     def populate(self, size: int) -> None:
         super().populate(size)
         self._initialize_parameters()

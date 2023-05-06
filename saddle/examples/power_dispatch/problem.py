@@ -21,8 +21,9 @@ class DispatchProblem:
     demand_constraint: ParametricFunction
     min_power_constraint: ParametricFunction
     max_power_constraint: ParametricFunction
+    constraints: dict[str, ParametricFunction]
 
-    def __post_init__(self) -> None:
+    def __init__(self) -> None:
         self.fn_obj = ParametricFunction(func=cost, params=self.params)
         self.demand_constraint = ParametricFunction(
             func=demand_constraint, demand=self.demand
@@ -33,6 +34,11 @@ class DispatchProblem:
         self.max_power_constraint = ParametricFunction(
             func=max_power_constraint, params=self.params
         )
+        self.constraints = {
+            'demand_constraint': self.demand_constraint,
+            'min_power_constraint': self.min_power_constraint,
+            'max_power_constraint': self.max_power_constraint,
+        }
 
 
 @dataclass
@@ -44,6 +50,7 @@ class ThreeGenerators(DispatchProblem):
         )
         self.variables = [f'p{i}' for i in range(1, 4)]
         self.demand = 850.0
+        super().__init__()
 
 
 @dataclass
@@ -55,6 +62,7 @@ class ThirteenGenerators(DispatchProblem):
         )
         self.variables = [f'p{i}' for i in range(1, 14)]
         self.demand = 2520.0
+        super().__init__()
 
 
 @dataclass
@@ -66,14 +74,16 @@ class NineteenGenerators(DispatchProblem):
         )
         self.variables = [f'p{i}' for i in range(1, 20)]
         self.demand = 2908.0
+        super().__init__()
 
 
 @dataclass
 class FortyGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            os.path.join(PATH, 'systems', '3_gen.csv'),
+            os.path.join(PATH, 'systems', '40_gen.csv'),
             dtype=np.float32,
         )
         self.variables = [f'p{i}' for i in range(1, 41)]
         self.demand = 10500.0
+        super().__init__()

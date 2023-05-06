@@ -2,6 +2,7 @@ from typing import Callable
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+
 from ..core.base import BaseMetaheuristicOptimizer
 from ...types import ArrayLike, ParametricFunction
 import numpy as np
@@ -25,20 +26,27 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
+        size: int,
         fn_obj: Callable | ParametricFunction,
+        constraints: dict[str, Callable | ParametricFunction] | None = None,
         seed: int = 42,
         w: float = 0.8,
         c1: float = 0.1,
         c2: float = 0.1,
-        size: int = 5,
     ) -> None:
-        super().__init__(
-            variables, upper_bounds, lower_bounds, iterations, fn_obj, seed
-        )
         self.w = w
         self.c1 = c1
         self.c2 = c2
-        self.populate(size=size)
+        super().__init__(
+            variables,
+            upper_bounds,
+            lower_bounds,
+            iterations,
+            size,
+            fn_obj,
+            constraints,
+            seed,
+        )
 
     def populate(self, size: int) -> None:
         super().populate(size)

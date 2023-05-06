@@ -4,14 +4,13 @@ import numpy as np
 
 def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
     p = pop.values.T
-    _cost = (
-        params['a'].values * p**2
-        + params['b'].values * p
-        + params['c'].values
-        + np.abs(
-            params['e'].values * np.sin(params['f'].values * (params['min'].values - p))
-        )
-    )
+    a = np.expand_dims(params['a'].values, axis=1)
+    b = np.expand_dims(params['b'].values, axis=1)
+    c = np.expand_dims(params['c'].values, axis=1)
+    e = np.expand_dims(params['e'].values, axis=1)
+    f = np.expand_dims(params['f'].values, axis=1)
+    _min = np.expand_dims(params['min'].values, axis=1)
+    _cost = a * p**2 + b * p + c + np.abs(e * np.sin(f * (_min - p)))
     return pd.Series(
         np.sum(
             _cost,
@@ -27,11 +26,13 @@ def demand_constraint(pop: pd.DataFrame, demand: float) -> pd.Series:
 
 def min_power_constraint(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
     p = pop.values.T
-    violation = params['min'].values - p
+    _min = np.expand_dims(params['min'].values, axis=1)
+    violation = _min - p
     return pd.Series(np.where(violation < 0, 0, violation))
 
 
 def max_power_constraint(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
     p = pop.values.T
-    violation = p - params['max'].values
+    _max = np.expand_dims(params['max'].values, axis=1)
+    violation = p - _max
     return pd.Series(np.where(violation < 0, 0, violation))
