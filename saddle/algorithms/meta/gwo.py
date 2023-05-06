@@ -42,7 +42,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             C = self.C[t]
 
             self.calculate_metric()
-            best_indexes = self.population['metric'].argsort()
+            best_indexes = self.population["metric"].argsort()
             alpha = self.population.loc[best_indexes[0], self.variables].to_numpy()
             beta = self.population.loc[best_indexes[1], self.variables].to_numpy()
             delta = self.population.loc[best_indexes[2], self.variables].to_numpy()

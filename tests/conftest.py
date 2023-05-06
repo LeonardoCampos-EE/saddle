@@ -35,4 +35,4 @@ def seed() -> int:
 
 @pytest.fixture
 def variables() -> list[str]:
-    return ['x']
+    return ["x"]

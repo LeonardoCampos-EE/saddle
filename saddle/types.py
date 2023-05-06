@@ -2,7 +2,7 @@ from typing import TypeVar, Callable
 import pandas as pd
 import numpy as np
 
-ArrayLike = TypeVar('ArrayLike', pd.Series, np.ndarray, list)
+ArrayLike = TypeVar("ArrayLike", pd.Series, np.ndarray, list)
 
 
 class ParametricFunction:

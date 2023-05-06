@@ -35,9 +35,9 @@ class DispatchProblem:
             func=max_power_constraint, params=self.params
         )
         self.constraints = {
-            'demand_constraint': self.demand_constraint,
-            'min_power_constraint': self.min_power_constraint,
-            'max_power_constraint': self.max_power_constraint,
+            "demand_constraint": self.demand_constraint,
+            "min_power_constraint": self.min_power_constraint,
+            "max_power_constraint": self.max_power_constraint,
         }
 
 
@@ -45,10 +45,10 @@ class DispatchProblem:
 class ThreeGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            os.path.join(PATH, 'systems', '3_gen.csv'),
+            os.path.join(PATH, "systems", "3_gen.csv"),
             dtype=np.float32,
         )
-        self.variables = [f'p{i}' for i in range(1, 4)]
+        self.variables = [f"p{i}" for i in range(1, 4)]
         self.demand = 850.0
         super().__init__()
 
@@ -57,10 +57,10 @@ class ThreeGenerators(DispatchProblem):
 class ThirteenGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            os.path.join(PATH, 'systems', '13_gen.csv'),
+            os.path.join(PATH, "systems", "13_gen.csv"),
             dtype=np.float32,
         )
-        self.variables = [f'p{i}' for i in range(1, 14)]
+        self.variables = [f"p{i}" for i in range(1, 14)]
         self.demand = 2520.0
         super().__init__()
 
@@ -69,10 +69,10 @@ class ThirteenGenerators(DispatchProblem):
 class NineteenGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            os.path.join(PATH, 'systems', '19_gen.csv'),
+            os.path.join(PATH, "systems", "19_gen.csv"),
             dtype=np.float32,
         )
-        self.variables = [f'p{i}' for i in range(1, 20)]
+        self.variables = [f"p{i}" for i in range(1, 20)]
         self.demand = 2908.0
         super().__init__()
 
@@ -81,9 +81,9 @@ class NineteenGenerators(DispatchProblem):
 class FortyGenerators(DispatchProblem):
     def __init__(self) -> None:
         self.params = pd.read_csv(
-            os.path.join(PATH, 'systems', '40_gen.csv'),
+            os.path.join(PATH, "systems", "40_gen.csv"),
             dtype=np.float32,
         )
-        self.variables = [f'p{i}' for i in range(1, 41)]
+        self.variables = [f"p{i}" for i in range(1, 41)]
         self.demand = 10500.0
         super().__init__()

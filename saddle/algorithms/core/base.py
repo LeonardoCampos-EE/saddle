@@ -28,7 +28,7 @@ class BaseOptimizer(ABC):
         self.variables = variables
         self.constraints = constraints or {}
         self.columns = (
-            self.variables + ['fn_obj'] + list(self.constraints.keys()) + ['metric']
+            self.variables + ["fn_obj"] + list(self.constraints.keys()) + ["metric"]
         )
 
         self.upper_bounds = convert_bounds_to_series(upper_bounds, self.variables)
@@ -101,7 +101,7 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
 
     def _calculate_fn_obj(self) -> None:
         fn_values: pd.Series = self.fn_obj(self.population.loc[:, self.variables])
-        self.population.loc[:, 'fn_obj'] = fn_values
+        self.population.loc[:, "fn_obj"] = fn_values
 
     def _calculate_constraints(self) -> None:
         for name, constraint in self.constraints.items():
@@ -113,10 +113,10 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
     def calculate_metric(self) -> None:
         self._calculate_fn_obj()
         self._calculate_constraints()
-        metric = self.population.loc[:, ['fn_obj'] + list(self.constraints.keys())].sum(
+        metric = self.population.loc[:, ["fn_obj"] + list(self.constraints.keys())].sum(
             axis=1
         )
-        self.population.loc[:, 'metric'] = metric
+        self.population.loc[:, "metric"] = metric
 
     def plot_contours(self, optima: list[float]) -> Figure:
         raise NotImplementedError

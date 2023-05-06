@@ -15,5 +15,5 @@ def test_gwo_convergence(
     )
     pso.populate(size=pop_size)
     pso.optimize()
-    assert_allclose(pso.population['metric'].min(), 0.0, rtol=1e-2, atol=1e-2)
+    assert_allclose(pso.population["metric"].min(), 0.0, rtol=1e-2, atol=1e-2)
     return
