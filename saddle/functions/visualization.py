@@ -44,15 +44,16 @@ def plot_contour(
     df = {"x1": x1, "x2": x2}
     f = fun(df)
 
-    fig = plt.figure()
-    plt.imshow(
+    fig, ax = plt.subplots()
+    fig.set_tight_layout(True)
+    img = ax.imshow(
         f,
         extent=[lower[0], upper[0], lower[1], upper[1]],
         origin="lower",
         alpha=0.5,
     )
-    plt.colorbar()
-    plt.scatter(
+    fig.colorbar(img, ax=ax)
+    ax.scatter(
         [optima[0]],
         [optima[1]],
         marker="x",
@@ -60,6 +61,6 @@ def plot_contour(
         c="gold",
         label="optima",
     )
-    contours = plt.contour(x1, x2, f, 10, colors="black", alpha=0.4)
-    plt.clabel(contours, inline=True, fontsize=8, fmt="%.0f")
-    return fig
+    contours = ax.contour(x1, x2, f, 10, colors="black", alpha=0.4)
+    ax.clabel(contours, inline=True, fontsize=8, fmt="%.0f")
+    return fig, ax

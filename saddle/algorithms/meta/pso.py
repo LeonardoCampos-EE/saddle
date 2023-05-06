@@ -46,21 +46,24 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
         self._initialize_history()
 
     def _initialize_history(self) -> None:
-        self.velocity_history = [self.velocity.copy()]
-        self.g_best_history = self.g_best.copy()
-        self.g_best_history['iteration'] = 0
-        self.p_best_history = self.p_best.copy()
-        self.p_best_history['iteration'] = 0
+        self.velocity_history = []
+        self.g_best_history = pd.DataFrame()
+        self.p_best_history = pd.DataFrame()
+        self.population_history = pd.DataFrame()
 
     def _update_history(self, t: int) -> None:
         self.velocity_history.append(self.velocity.copy())
         gbest = self.g_best.copy()
-        gbest['iteration'] = t
+        gbest["iteration"] = t
         self.g_best_history = pd.concat([self.g_best_history, gbest])
 
         pbest = self.p_best.copy()
-        pbest['iteration'] = t
+        pbest["iteration"] = t
         self.p_best_history = pd.concat([self.p_best_history, pbest])
+
+        pop = self.population.copy()
+        pop["iteration"] = t
+        self.population_history = pd.concat([self.population_history, pop])
 
     def _initialize_parameters(self) -> None:
         # r1 and r2 -> random numbers between 0 and 1
@@ -74,11 +77,11 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
 
         # P best -> best historical points for the whole population
         self.p_best = self.population.copy()
-        self.p_best.loc[:, 'metric'] = np.inf
+        self.p_best.loc[:, "metric"] = np.inf
 
         # G best -> best solution so far
         self.g_best = self.population.loc[[0], :].copy()
-        self.g_best.loc[:, 'metric'] = np.inf
+        self.g_best.loc[:, "metric"] = np.inf
 
     def optimize(self) -> None:
         for t in range(self.iterations):
@@ -86,17 +89,17 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
             self.calculate_metric()
             self._get_p_best()
             # Get the index of the best member of the population
-            best_index = self.population['metric'].argsort()[0]
+            best_index = self.population["metric"].argsort()[0]
             self._get_g_best(best_index=best_index)
-            self._update_history(t)
+
             self.update(t=t)
 
     def _get_p_best(self) -> None:
         # Current population metric
-        pop_metric = self.population.loc[:, 'metric'].to_numpy()
+        pop_metric = self.population.loc[:, "metric"].to_numpy()
 
         # P best metric
-        p_best_metric = self.p_best.loc[:, 'metric'].to_numpy()
+        p_best_metric = self.p_best.loc[:, "metric"].to_numpy()
 
         mask = pop_metric < p_best_metric
 
@@ -105,11 +108,12 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
 
     def _get_g_best(self, best_index: int) -> None:
         best = self.population.iloc[[best_index]]
-        if best['metric'].iloc[0] < self.g_best['metric'].iloc[0]:
+        if best["metric"].iloc[0] < self.g_best["metric"].iloc[0]:
             self.g_best = best.reset_index(drop=True)
 
     def update(self, t: int) -> None:
         self._update_velocity(t=t)
+        self._update_history(t)
         self._update_population()
 
         self.population.loc[:, self.variables] = clip_dataframe(
@@ -133,24 +137,66 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
         self.population.loc[:, self.variables] += self.velocity
 
     def plot_contours(self, optima: list[float]) -> Figure:
-        fig = plot_contour(
+        fig, ax = plot_contour(
             fun=self.fn_obj,
             lower=self.lower_bounds.to_list(),
             upper=self.upper_bounds.to_list(),
             optima=optima,
         )
 
+        gbest_plot = ax.scatter(
+            x=self.g_best_history[self.variables[0]].iloc[0],
+            y=self.g_best_history[self.variables[1]].iloc[0],
+            c="red",
+            marker="x",
+            s=10,
+            label="G Best",
+        )
+        pop = self.population_history.loc[self.population_history["iteration"] == 0][
+            self.variables
+        ].to_numpy()
+        pop_plot = ax.scatter(
+            pop[:, 0],
+            pop[:, 1],
+            c="blue",
+            marker="o",
+            alpha=0.5,
+            label="Population",
+        )
+        vel = self.velocity_history[0]
+        vel_plot = ax.quiver(
+            pop[:, 0],
+            pop[:, 1],
+            vel[:, 0],
+            vel[:, 1],
+            color="blue",
+            width=0.005,
+            angles="xy",
+            scale_units="xy",
+            scale=1,
+        )
+
         def animate(i):
-            plt.scatter(
-                x=self.g_best_history[self.variables[0]].iloc[i],
-                y=self.g_best_history[self.variables[1]].iloc[i],
-                c='red',
-                marker='x',
-                s=10,
-                label='G Best',
-                figure=fig,
-            )
+            ax.set_title(f"Iteration {i}")
+            pop = self.population_history.loc[
+                self.population_history["iteration"] == i
+            ][self.variables].to_numpy()
+            vel = self.velocity_history[i]
+            pop_plot.set_offsets(pop)
+            vel_plot.set_offsets(pop)
+            vel_plot.set_UVC(vel[:, 0], vel[:, 1])
+            gbest_plot.set_offsets(self.g_best_history.iloc[i][self.variables])
             plt.legend()
-            plt.show()
+            return ax, pop_plot, vel_plot, gbest_plot
+
+        anim = FuncAnimation(
+            fig,
+            animate,
+            frames=list(range(1, len(self.velocity_history))),
+            interval=500,
+            blit=False,
+            repeat=True,
+        )
+        anim.save("pso.gif", dpi=120, writer="pillow")
 
         return fig
