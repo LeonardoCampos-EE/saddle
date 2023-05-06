@@ -29,6 +29,7 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
         size: int,
         fn_obj: Callable | ParametricFunction,
         constraints: dict[str, Callable | ParametricFunction] | None = None,
+        penalties: dict[str, float] | None = None,
         seed: int = 42,
         w: float = 0.8,
         c1: float = 0.1,
@@ -45,6 +46,7 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
             size,
             fn_obj,
             constraints,
+            penalties,
             seed,
         )
 

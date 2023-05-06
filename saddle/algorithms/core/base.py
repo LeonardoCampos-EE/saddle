@@ -9,11 +9,12 @@ from ...functions.converters import convert_bounds_to_series
 
 
 class BaseOptimizer(ABC):
-    fn_obj: Callable | ParametricFunction
     variables: list[str]
     upper_bounds: pd.Series
     lower_bounds: pd.Series
     iterations: int
+    fn_obj: Callable | ParametricFunction
+    constraints: dict[str, Callable | ParametricFunction]
 
     def __init__(
         self,
@@ -63,11 +64,15 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         size: int,
         fn_obj: Callable | ParametricFunction,
         constraints: dict[str, Callable | ParametricFunction] | None = None,
+        penalties: dict[str, float] | None = None,
         seed: int = 42,
     ) -> None:
         self.seed = seed
         self.size = size
         np.random.seed(self.seed)
+        if constraints:
+            self.penalties = penalties or {name: 100.0 for name in constraints}
+            assert len(constraints) == len(self.penalties)
         super().__init__(
             variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints
         )
@@ -85,7 +90,12 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         ) + low
 
         fn_obj = np.zeros(shape=(size, 1))
-        population = np.hstack([population, fn_obj, fn_obj])
+        metric = fn_obj.copy()
+        if self.constraints:
+            constraints = np.zeros(shape=(size, len(self.constraints)))
+            population = np.hstack([population, fn_obj, constraints, metric])
+        else:
+            population = np.hstack([population, fn_obj, metric])
 
         self.population = pd.DataFrame(population, columns=self.columns)
 
@@ -98,10 +108,11 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
             constraint_values: pd.Series = constraint(
                 self.population.loc[:, self.variables]
             )
-            self.population.loc[:, name] = constraint_values
+            self.population.loc[:, name] = self.penalties[name] * constraint_values
 
     def calculate_metric(self) -> None:
         self._calculate_fn_obj()
+        self._calculate_constraints()
         metric = self.population.loc[:, ['fn_obj'] + list(self.constraints.keys())].sum(
             axis=1
         )
