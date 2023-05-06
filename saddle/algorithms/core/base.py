@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
 
-from ...types import ArrayLike
+from ...types import ArrayLike, ParametricFunction
 from ...functions.converters import convert_bounds_to_series
 
 
 class BaseOptimizer(ABC):
-    fn_obj: callable
+    fn_obj: Callable | ParametricFunction
     variables: list[str]
     upper_bounds: pd.Series
     lower_bounds: pd.Series
@@ -20,7 +21,7 @@ class BaseOptimizer(ABC):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
-        fn_obj: callable,
+        fn_obj: Callable | ParametricFunction,
     ) -> None:
         self.variables = variables
         self.columns = self.variables + ['fn_obj', 'metric']
@@ -55,7 +56,7 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
-        fn_obj: callable,
+        fn_obj: Callable | ParametricFunction,
         seed: int = 42,
     ) -> None:
         self.seed = seed

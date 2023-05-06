@@ -1,9 +1,10 @@
+from typing import Callable
 import pytest
 from saddle.functions.benchmarks import parabola
 
 
 @pytest.fixture
-def fn_obj() -> callable:
+def fn_obj() -> Callable:
     return parabola
 
 

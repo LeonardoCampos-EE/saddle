@@ -1,8 +1,9 @@
+from typing import Callable
 import numpy as np
 import pandas as pd
 from ..core.base import BaseMetaheuristicOptimizer
 from ...functions.utils import clip_dataframe
-from ...types import ArrayLike
+from ...types import ArrayLike, ParametricFunction
 
 
 class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
@@ -12,7 +13,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         upper_bounds: ArrayLike,
         lower_bounds: ArrayLike,
         iterations: int,
-        fn_obj: callable,
+        fn_obj: Callable | ParametricFunction,
         seed: int = 42,
         size: int = 12,
     ) -> None:
@@ -58,7 +59,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             C = self.C[t]
 
             self.calculate_metric()
-            best_indexes = self.population["metric"].argsort()
+            best_indexes = self.population['metric'].argsort()
             alpha = self.population.loc[best_indexes[0], self.variables].to_numpy()
             beta = self.population.loc[best_indexes[1], self.variables].to_numpy()
             delta = self.population.loc[best_indexes[2], self.variables].to_numpy()
