@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Callable
 import numpy as np
 import pandas as pd
-from matplotlib.figure import Figure
 
 from ...types import ArrayLike, ParametricFunction
 from ...functions.converters import convert_bounds_to_series
@@ -117,6 +116,3 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
             axis=1
         )
         self.population.loc[:, "metric"] = metric
-
-    def plot_contours(self, optima: list[float]) -> Figure:
-        raise NotImplementedError

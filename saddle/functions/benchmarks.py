@@ -13,3 +13,7 @@ def f1(pop: pd.DataFrame) -> pd.Series:
         + np.sin(3 * pop["x1"] + 1.41)
         + np.sin(4 * pop["x2"] - 1.73)
     )
+
+
+def rosenbrock(pop: pd.DataFrame) -> pd.Series:
+    return (1 - pop["x1"]) ** 2 + 100 * (pop["x2"] - pop["x1"] ** 2) ** 2

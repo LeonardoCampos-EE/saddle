@@ -76,12 +76,8 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
     def _initialize_parameters(self) -> None:
         # r1 and r2 -> random numbers between 0 and 1
         # shape -> (iterations, size, variables)
-        self.r1 = np.random.random_sample(
-            size=(self.iterations, self.size, len(self.variables))
-        )
-        self.r2 = np.random.random_sample(
-            size=(self.iterations, self.size, len(self.variables))
-        )
+        self.r1 = np.random.random_sample(size=(self.iterations, 1))
+        self.r2 = np.random.random_sample(size=(self.iterations, 1))
 
         # P best -> best historical points for the whole population
         self.p_best = self.population.copy()

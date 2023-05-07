@@ -2,6 +2,7 @@ from typing import Callable
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 from matplotlib.ticker import LinearLocator
 from matplotlib import cm
 from ...types import ParametricFunction
@@ -16,7 +17,9 @@ def mesh(lower: list[float], upper: list[float]) -> np.ndarray:
 
 
 def plot_mesh(
-    fun: Callable | ParametricFunction, lower: list[float], upper: list[float]
+    fun: Callable | ParametricFunction,
+    lower: list[float],
+    upper: list[float],
 ):
     assert len(lower) == 2
     assert len(upper) == 2
@@ -54,6 +57,7 @@ def plot_contour(
     fig.set_tight_layout(True)
     img = ax.imshow(
         f,
+        cmap=cm.coolwarm,
         extent=[lower[0], upper[0], lower[1], upper[1]],
         origin="lower",
         alpha=0.5,
@@ -63,11 +67,18 @@ def plot_contour(
         [optima[0]],
         [optima[1]],
         marker="x",
-        s=15,
+        s=20,
         c="gold",
         label="optima",
     )
-    contours = ax.contour(x1, x2, f, 10, colors="black", alpha=0.4)
+    contours = ax.contour(
+        x1,
+        x2,
+        f,
+        20,
+        colors="black",
+        alpha=0.4,
+    )
     ax.clabel(contours, inline=True, fontsize=8, fmt="%.0f")
     return fig, ax
 

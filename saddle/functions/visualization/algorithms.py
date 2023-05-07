@@ -55,7 +55,7 @@ def plot_pso_search(alg: ParticleSwarmOptimizer, optima: list[float]) -> Figure:
         vel_plot.set_offsets(pop)
         vel_plot.set_UVC(vel[:, 0], vel[:, 1])
         gbest_plot.set_offsets(alg.g_best_history.iloc[i][alg.variables])
-        plt.legend()
+        plt.legend(loc="upper left")
         return ax, pop_plot, vel_plot, gbest_plot
 
     anim = FuncAnimation(
