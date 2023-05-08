@@ -70,7 +70,7 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         self.size = size
         np.random.seed(self.seed)
         if constraints:
-            self.penalties = penalties or {name: 100.0 for name in constraints}
+            self.penalties = penalties or {name: 1000.0 for name in constraints}
             assert len(constraints) == len(self.penalties)
         super().__init__(
             variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints
