@@ -8,6 +8,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
     def populate(self, size: int) -> None:
         super().populate(size)
         self._initialize_parameters()
+        self._initialize_history()
 
     def _initialize_parameters(self) -> None:
         # Array containing the number of iterations
@@ -35,6 +36,30 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         # shape -> (iterations, size, variables)
         self.C = 2 * self.r2
 
+    def _initialize_history(self) -> None:
+        self.alpha_history = pd.DataFrame()
+        self.beta_history = pd.DataFrame()
+        self.delta_history = pd.DataFrame()
+        self.population_history = pd.DataFrame()
+
+    def _update_history(self, t: int, best_indexes: np.ndarray) -> None:
+        alpha = self.population.iloc[[best_indexes[0]]].copy()
+        beta = self.population.iloc[[best_indexes[1]]].copy()
+        delta = self.population.iloc[[best_indexes[2]]].copy()
+
+        alpha["iteration"] = t
+        self.alpha_history = pd.concat([self.alpha_history, alpha])
+
+        beta["iteration"] = t
+        self.beta_history = pd.concat([self.beta_history, beta])
+
+        delta["iteration"] = t
+        self.delta_history = pd.concat([self.delta_history, delta])
+
+        pop = self.population.copy()
+        pop["iteration"] = t
+        self.population_history = pd.concat([self.population_history, pop])
+
     def optimize(self) -> None:
         for t in range(self.iterations):
             # Get parameters for current iteration
@@ -42,10 +67,11 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             C = self.C[t]
 
             self.calculate_metric()
-            best_indexes = self.population["metric"].argsort()
+            best_indexes = self.population["metric"].argsort().to_numpy()
             alpha = self.population.loc[best_indexes[0], self.variables].to_numpy()
             beta = self.population.loc[best_indexes[1], self.variables].to_numpy()
             delta = self.population.loc[best_indexes[2], self.variables].to_numpy()
+            self._update_history(t, best_indexes)
 
             self.update(A, C, alpha, beta, delta)
 

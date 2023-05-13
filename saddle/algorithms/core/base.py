@@ -68,7 +68,8 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
     ) -> None:
         self.seed = seed
         self.size = size
-        np.random.seed(self.seed)
+        if seed:
+            np.random.seed(self.seed)
         if constraints:
             self.penalties = penalties or {name: 1000.0 for name in constraints}
             assert len(constraints) == len(self.penalties)

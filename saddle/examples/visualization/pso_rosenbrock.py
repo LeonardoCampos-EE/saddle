@@ -21,7 +21,7 @@ if __name__ == "__main__":
         iterations=20,
         fn_obj=rosenbrock,
         size=20,
-        seed=None,
+        seed=0,
     )
     alg.optimize()
     plot_pso_search(alg, optima=optima)

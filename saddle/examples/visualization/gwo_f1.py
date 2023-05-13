@@ -1,8 +1,8 @@
 from saddle.functions.benchmarks import f1
 import matplotlib.pyplot as plt
-from saddle.algorithms.meta.pso import ParticleSwarmOptimizer
+from saddle.algorithms.meta.gwo import GreyWolfOptimizer
 from saddle.functions.visualization.visualization import plot_mesh, plot_contour
-from saddle.functions.visualization.algorithms import plot_pso_search
+from saddle.functions.visualization.algorithms import plot_gwo_search
 
 if __name__ == "__main__":
     low = [0.0, 0.0]
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     plt.legend()
     # plt.show()
 
-    alg = ParticleSwarmOptimizer(
+    alg = GreyWolfOptimizer(
         variables=["x1", "x2"],
         upper_bounds=u,
         lower_bounds=low,
@@ -23,5 +23,5 @@ if __name__ == "__main__":
         size=20,
     )
     alg.optimize()
-    plot_pso_search(alg, optima=optima)
+    plot_gwo_search(alg, optima=optima)
     plt.show()
