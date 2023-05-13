@@ -90,7 +90,7 @@ class ParticleSwarmOptimizer(BaseMetaheuristicOptimizer):
     def optimize(self) -> None:
         for t in range(self.iterations):
             # Get parameters for current iteration
-            self.calculate_metric()
+            self.calculate_metric(t=t)
             self._get_p_best()
             # Get the index of the best member of the population
             best_index = self.population["metric"].argsort()[0]

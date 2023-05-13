@@ -53,6 +53,7 @@ class BaseOptimizer(ABC):
 class BaseMetaheuristicOptimizer(BaseOptimizer):
     population: pd.DataFrame = pd.DataFrame()
     seed: int
+    penalties: dict[str, np.ndarray]
 
     def __init__(
         self,
@@ -71,8 +72,17 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         if seed:
             np.random.seed(self.seed)
         if constraints:
-            self.penalties = penalties or {name: 1000.0 for name in constraints}
-            assert len(constraints) == len(self.penalties)
+            if penalties:
+                assert len(constraints) == len(penalties)
+                self.penalties = {
+                    name: np.linspace(10, penalties[name], num=iterations)
+                    for name in penalties
+                }
+            else:
+                self.penalties = {
+                    name: np.linspace(10, 100000, num=iterations)
+                    for name in constraints
+                }
         super().__init__(
             variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints
         )
@@ -103,17 +113,28 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         fn_values: pd.Series = self.fn_obj(self.population.loc[:, self.variables])
         self.population.loc[:, "fn_obj"] = fn_values
 
-    def _calculate_constraints(self) -> None:
+    def _calculate_constraints(self, t: int) -> None:
         for name, constraint in self.constraints.items():
             constraint_values: pd.Series = constraint(
                 self.population.loc[:, self.variables]
             )
-            self.population.loc[:, name] = self.penalties[name] * constraint_values
+            self.population.loc[:, name] = self.penalties[name][t] * constraint_values
 
-    def calculate_metric(self) -> None:
+    def _divide_by_penalties(self, t: int) -> None:
+        """
+        This function divides the constraints by the penalty value to keep the real
+        constraint value in the history
+        """
+        for name in self.constraints:
+            self.population.loc[:, name] = (
+                self.population.loc[:, name] / self.penalties[name][t]
+            )
+
+    def calculate_metric(self, t: int) -> None:
         self._calculate_fn_obj()
-        self._calculate_constraints()
+        self._calculate_constraints(t=t)
         metric = self.population.loc[:, ["fn_obj"] + list(self.constraints.keys())].sum(
             axis=1
         )
         self.population.loc[:, "metric"] = metric
+        self._divide_by_penalties(t=t)

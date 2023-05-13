@@ -66,7 +66,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             A = self.A[t]
             C = self.C[t]
 
-            self.calculate_metric()
+            self.calculate_metric(t=t)
             best_indexes = self.population["metric"].argsort().to_numpy()
             alpha = self.population.loc[best_indexes[0], self.variables].to_numpy()
             beta = self.population.loc[best_indexes[1], self.variables].to_numpy()
@@ -98,9 +98,9 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         # Update population
         population = (X_alpha + X_beta + X_delta) / 3.0
 
-        if not self.constraints:
-            population = clip_dataframe(
-                population, upper=self.upper_bounds, lower=self.lower_bounds
-            )
+        # if not self.constraints:
+        population = clip_dataframe(
+            population, upper=self.upper_bounds, lower=self.lower_bounds
+        )
         self.population.loc[:, self.variables] = population
         return
