@@ -20,21 +20,21 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
 
         # r1 and r2 -> random numbers between 0 and 1
         # shape -> (iterations, size, variables)
-        self.r1 = np.random.random_sample(
-            size=(self.iterations, self.size, len(self.variables))
-        )
-        self.r2 = np.random.random_sample(
-            size=(self.iterations, self.size, len(self.variables))
-        )
+        def r():
+            return np.random.random_sample(
+                size=(self.iterations, self.size, len(self.variables))
+            )
 
         # A(t) -> controls the step size of each wolf in the search space
         # shape -> (iterations, size, variables)
         a = self.a[:, np.newaxis, np.newaxis]
-        self.A = (2 * a * self.r1) - a
+        self.A_alpha = (2 * a * r()) - a
+        self.A_beta = (2 * a * r()) - a
+        self.A_delta = (2 * a * r()) - a
 
         # C(t) -> controls the movement of each wolf towards the best solutions
         # shape -> (iterations, size, variables)
-        self.C = 2 * self.r2
+        self.C = 2 * r()
 
     def _initialize_history(self) -> None:
         self.alpha_history = pd.DataFrame()
@@ -62,10 +62,6 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
 
     def optimize(self) -> None:
         for t in range(self.iterations):
-            # Get parameters for current iteration
-            A = self.A[t]
-            C = self.C[t]
-
             self.calculate_metric(t=t)
             best_indexes = self.population["metric"].argsort().to_numpy()
             alpha = self.population.loc[best_indexes[0], self.variables].to_numpy()
@@ -73,27 +69,22 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             delta = self.population.loc[best_indexes[2], self.variables].to_numpy()
             self._update_history(t, best_indexes)
 
-            self.update(A, C, alpha, beta, delta)
+            self.update(alpha, beta, delta, t)
 
     def update(
-        self,
-        A: np.ndarray,
-        C: np.ndarray,
-        alpha: pd.Series,
-        beta: pd.Series,
-        delta: pd.Series,
+        self, alpha: pd.Series, beta: pd.Series, delta: pd.Series, t: int
     ) -> None:
         # Calculate D_alpha, D_beta, D_delta
         population = self.population.loc[:, self.variables]
 
-        D_alpha = np.abs(np.multiply(C, alpha) - population)
-        D_beta = np.abs(np.multiply(C, beta) - population)
-        D_delta = np.abs(np.multiply(C, delta) - population)
+        D_alpha = np.abs(np.multiply(self.C[t], alpha) - population)
+        D_beta = np.abs(np.multiply(self.C[t], beta) - population)
+        D_delta = np.abs(np.multiply(self.C[t], delta) - population)
 
         # Calculate X_alpha, X_beta, X_delta
-        X_alpha = alpha - np.multiply(A, D_alpha)
-        X_beta = beta - np.multiply(A, D_beta)
-        X_delta = delta - np.multiply(A, D_delta)
+        X_alpha = alpha - np.multiply(self.A_alpha[t], D_alpha)
+        X_beta = beta - np.multiply(self.A_beta[t], D_beta)
+        X_delta = delta - np.multiply(self.A_delta[t], D_delta)
 
         # Update population
         population = (X_alpha + X_beta + X_delta) / 3.0

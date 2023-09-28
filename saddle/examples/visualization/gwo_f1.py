@@ -20,7 +20,7 @@ if __name__ == "__main__":
         lower_bounds=low,
         iterations=20,
         fn_obj=f1,
-        size=20,
+        size=4,
     )
     alg.optimize()
     plot_gwo_search(alg, optima=optima)
