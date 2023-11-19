@@ -4,19 +4,20 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from saddle.types import ArrayLike, ParametricFunction
+from saddle.core.types import ArrayLike
+from saddle.core.parametric_function import ParametricFunction
 from saddle.functions.converters import convert_bounds_to_series
 from saddle.examples.power_dispatch.problem import ThreeGenerators
 
 
 def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
     p = pop.values.T
-    a = np.expand_dims(params["a"].values, axis=1)
-    b = np.expand_dims(params["b"].values, axis=1)
-    c = np.expand_dims(params["c"].values, axis=1)
-    e = np.expand_dims(params["e"].values, axis=1)
-    f = np.expand_dims(params["f"].values, axis=1)
-    _min = np.expand_dims(params["min"].values, axis=1)
+    a = np.expand_dims(params["a"].values, axis=1)  # type: ignore
+    b = np.expand_dims(params["b"].values, axis=1)  # type: ignore
+    c = np.expand_dims(params["c"].values, axis=1)  # type: ignore
+    e = np.expand_dims(params["e"].values, axis=1)  # type: ignore
+    f = np.expand_dims(params["f"].values, axis=1)  # type: ignore
+    _min = np.expand_dims(params["min"].values, axis=1)  # type: ignore
     _cost = a * p**2 + b * p + c + np.abs(e * np.sin(f * (_min - p)))
     return pd.Series(
         np.sum(
@@ -40,7 +41,7 @@ def min_power_constraint(
     u_cols = [col for col in multipliers.columns if "u_min" in col]
     u = multipliers[u_cols].values.T
     p = pop.values.T
-    _min = np.expand_dims(params["min"].values, axis=1)
+    _min = np.expand_dims(params["min"].values, axis=1)  # type: ignore
     violation = (_min - p) * u
     violation = np.sum(violation.T, axis=1)
     return pd.Series(violation)
@@ -52,7 +53,7 @@ def max_power_constraint(
     u_cols = [col for col in multipliers.columns if "u_max" in col]
     u = multipliers[u_cols].values.T
     p = pop.values.T
-    _max = np.expand_dims(params["max"].values, axis=1)
+    _max = np.expand_dims(params["max"].values, axis=1)  # type: ignore
     violation = (p - _max) * u
     violation = np.sum(violation.T, axis=1)
     return pd.Series(violation)
@@ -63,9 +64,9 @@ class PSOPrimalDual:
     seed: int
     penalties: dict[str, np.ndarray]
     lagrangian: pd.Series
-    w: float = (0.8,)
-    c1: float = (0.1,)
-    c2: float = (0.1,)
+    w: float = 0.8
+    c1: float = 0.1
+    c2: float = 0.1
 
     def __init__(
         self,
@@ -120,7 +121,7 @@ class PSOPrimalDual:
     def handle_u_min(self):
         u_cols = [col for col in self.lagrangian_multipliers.columns if "u_min" in col]
         p = self.population.loc[:, self.variables].values.T
-        _min = np.expand_dims(self.params["params"]["min"].values, axis=1)
+        _min = np.expand_dims(self.params["params"]["min"].values, axis=1)  # type: ignore
         violation = _min - p
 
         for i, col in enumerate(u_cols):
@@ -131,7 +132,7 @@ class PSOPrimalDual:
     def handle_u_max(self):
         u_cols = [col for col in self.lagrangian_multipliers.columns if "u_max" in col]
         p = self.population.loc[:, self.variables].values.T
-        _max = np.expand_dims(self.params["params"]["max"].values, axis=1)
+        _max = np.expand_dims(self.params["params"]["max"].values, axis=1)  # type: ignore
         violation = p - _max
         for i, col in enumerate(u_cols):
             _violation = violation[i]
@@ -202,12 +203,12 @@ class PSOPrimalDual:
         p_min = min_power_constraint(
             self.population.loc[:, self.variables],
             self.lagrangian_multipliers,
-            self.params["params"],
+            self.params["params"],  # type: ignore
         )
         p_max = max_power_constraint(
             self.population.loc[:, self.variables],
             self.lagrangian_multipliers,
-            self.params["params"],
+            self.params["params"],  # type: ignore
         )
         obj = self.fn_obj(self.population.loc[:, self.variables])
 
@@ -329,13 +330,14 @@ if __name__ == "__main__":
         size=pop_size,
         fn_obj=problem_3.fn_obj,
         constraints=problem_3.constraints,
-        params={"demand": problem_3.demand, "params": problem_3.params},
+        params={"demand": problem_3.demand, "params": problem_3.params},  # type: ignore
     )
     alg.optimize()
     pprint(alg.population)
     pprint(alg.lagrangian_multipliers)
     pprint(alg.best_multipliers)
     pprint(alg.g_best)
+    alg.g_best.to_csv("g_best.csv")
 
     plt.figure()
     plt.plot(np.arange(0, t), alg.f_obj_history, label="F obj")
@@ -349,6 +351,12 @@ if __name__ == "__main__":
     plt.show()
 
     plt.plot(np.arange(0, t), alg.metric_history, label="Metric")
+    plt.legend(loc="upper right")
+    plt.grid(True)
+    plt.show()
+
+    plt.figure()
+    plt.plot(np.arange(0, t), alg.lagrangian_history, label="Lagrangian")
     plt.legend(loc="upper right")
     plt.grid(True)
     plt.show()

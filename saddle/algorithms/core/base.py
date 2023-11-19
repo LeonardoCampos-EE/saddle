@@ -3,8 +3,9 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-from ...types import ArrayLike, ParametricFunction
-from ...functions.converters import convert_bounds_to_series
+from saddle.core.types import ArrayLike
+from saddle.core.parametric_function import ParametricFunction
+from saddle.functions.converters import convert_bounds_to_series
 
 
 class BaseOptimizer(ABC):
