@@ -1,20 +1,19 @@
 # type: ignore
 
-from typing import Callable
-import numpy as np
+from collections.abc import Callable
+
 import matplotlib.pyplot as plt
-
-
-from matplotlib.ticker import LinearLocator
+import numpy as np
 from matplotlib import cm
+from matplotlib.ticker import LinearLocator
 from saddle.core.parametric_function import ParametricFunction
 
 
 def mesh(lower: list[float], upper: list[float]) -> np.ndarray:
     return np.array(
         np.meshgrid(
-            np.linspace(lower[0], upper[0], 100), np.linspace(lower[1], upper[1], 100)
-        )
+            np.linspace(lower[0], upper[0], 100), np.linspace(lower[1], upper[1], 100),
+        ),
     )
 
 
@@ -32,7 +31,7 @@ def plot_mesh(
 
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     surface = ax.plot_surface(
-        x1, x2, f, cmap=cm.coolwarm, linewidth=0, antialiased=False
+        x1, x2, f, cmap=cm.coolwarm, linewidth=0, antialiased=False,
     )
     ax.set_zlim(f.min() - 0.01, f.max() + 0.01)
     ax.zaxis.set_major_locator(LinearLocator(10))

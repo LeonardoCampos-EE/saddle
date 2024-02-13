@@ -1,13 +1,15 @@
-import pandas as pd
-import numpy as np
 import os
-from saddle.types import ParametricFunction
 from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
+from saddle.types import ParametricFunction
+
 from .functions import (
     cost,
     demand_constraint,
-    min_power_constraint,
     max_power_constraint,
+    min_power_constraint,
 )
 
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -26,13 +28,13 @@ class DispatchProblem:
     def __init__(self) -> None:
         self.fn_obj = ParametricFunction(func=cost, params=self.params)
         self.demand_constraint = ParametricFunction(
-            func=demand_constraint, demand=self.demand
+            func=demand_constraint, demand=self.demand,
         )
         self.min_power_constraint = ParametricFunction(
-            func=min_power_constraint, params=self.params
+            func=min_power_constraint, params=self.params,
         )
         self.max_power_constraint = ParametricFunction(
-            func=max_power_constraint, params=self.params
+            func=max_power_constraint, params=self.params,
         )
         self.constraints = {
             "demand_constraint": self.demand_constraint,

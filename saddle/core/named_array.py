@@ -13,7 +13,7 @@ class NamedArray:
         self.arr = arr
 
     def __getitem__(
-        self, key: str | int | tuple[str, int] | tuple[int, int]
+        self, key: str | int | tuple[str, int] | tuple[int, int],
     ) -> npt.NDArray[np.float64]:
         if isinstance(key, str):
             if key not in self.names:
@@ -36,5 +36,15 @@ class NamedArray:
                 raise KeyError("Invalid key format. Must be (str, int) or (int, int).")
         else:
             raise TypeError(
-                "Key must be a str, int, or a tuple of (str, int) or (int, int)."
+                "Key must be a str, int, or a tuple of (str, int) or (int, int).",
             )
+
+    def __len__(self) -> int:
+        return len(self.arr)
+
+    def __repr__(self) -> str:
+        return f"NamedArray(names={self.names}, arr={self.arr})"
+
+    @property
+    def shape(self) -> tuple:
+        return self.arr.shape

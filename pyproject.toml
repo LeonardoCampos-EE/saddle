@@ -52,7 +52,7 @@ warn_unused_ignores = false                 # true
 show_column_numbers = true
 
 [tool.ruff]
-line-length = 88 
+line-length = 88
 select = ["ALL"]
 ignore = [
     "D203",

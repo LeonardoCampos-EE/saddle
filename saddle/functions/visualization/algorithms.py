@@ -1,9 +1,10 @@
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from .visualization import plot_contour
-from ...algorithms.meta.pso import ParticleSwarmOptimizer
+from matplotlib.figure import Figure
+
 from ...algorithms.meta.gwo import GreyWolfOptimizer
+from ...algorithms.meta.pso import ParticleSwarmOptimizer
+from .visualization import plot_contour
 
 
 def plot_pso_search(alg: ParticleSwarmOptimizer, optima: list[float]) -> Figure:

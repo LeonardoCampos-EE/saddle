@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from ..core.base import BaseMetaheuristicOptimizer
+
 from ...functions.utils import clip_dataframe
+from ..core.base import BaseMetaheuristicOptimizer
 
 
 class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
@@ -22,7 +23,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
         # shape -> (iterations, size, variables)
         def r():
             return np.random.random_sample(
-                size=(self.iterations, self.size, len(self.variables))
+                size=(self.iterations, self.size, len(self.variables)),
             )
 
         # A(t) -> controls the step size of each wolf in the search space
@@ -72,7 +73,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             self.update(alpha, beta, delta, t)
 
     def update(
-        self, alpha: np.ndarray, beta: np.ndarray, delta: np.ndarray, t: int
+        self, alpha: np.ndarray, beta: np.ndarray, delta: np.ndarray, t: int,
     ) -> None:
         # Calculate D_alpha, D_beta, D_delta
         population = self.population.loc[:, self.variables]
@@ -91,7 +92,6 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
 
         # if not self.constraints:
         population = clip_dataframe(
-            population, upper=self.upper_bounds, lower=self.lower_bounds
+            population, upper=self.upper_bounds, lower=self.lower_bounds,
         )
         self.population.loc[:, self.variables] = population
-        return

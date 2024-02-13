@@ -1,13 +1,13 @@
+from collections.abc import Callable
 from pprint import pprint
-from typing import Callable
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from saddle.core.types import ArrayLike
 from saddle.core.parametric_function import ParametricFunction
-from saddle.functions.converters import convert_bounds_to_series
+from saddle.core.types import ArrayLike
 from saddle.examples.power_dispatch.problem import ThreeGenerators
+from saddle.functions.converters import convert_bounds_to_series
 
 
 def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
@@ -23,12 +23,12 @@ def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
         np.sum(
             _cost,
             axis=0,
-        )
+        ),
     )
 
 
 def demand_constraint(
-    pop: pd.DataFrame, multipliers: pd.DataFrame, demand: float
+    pop: pd.DataFrame, multipliers: pd.DataFrame, demand: float,
 ) -> pd.Series:
     p = pop.values
     v = multipliers["v"].values
@@ -36,7 +36,7 @@ def demand_constraint(
 
 
 def min_power_constraint(
-    pop: pd.DataFrame, multipliers: pd.DataFrame, params: pd.DataFrame
+    pop: pd.DataFrame, multipliers: pd.DataFrame, params: pd.DataFrame,
 ) -> pd.Series:
     u_cols = [col for col in multipliers.columns if "u_min" in col]
     u = multipliers[u_cols].values.T
@@ -48,7 +48,7 @@ def min_power_constraint(
 
 
 def max_power_constraint(
-    pop: pd.DataFrame, multipliers: pd.DataFrame, params: pd.DataFrame
+    pop: pd.DataFrame, multipliers: pd.DataFrame, params: pd.DataFrame,
 ) -> pd.Series:
     u_cols = [col for col in multipliers.columns if "u_max" in col]
     u = multipliers[u_cols].values.T
@@ -144,7 +144,7 @@ class PSOPrimalDual:
         upp = self.upper_bounds.to_numpy()
         low = self.lower_bounds.to_numpy()
         population: np.ndarray = (upp - low) * np.random.uniform(
-            size=(size, len(self.variables))
+            size=(size, len(self.variables)),
         ) + low
 
         fn_obj = np.zeros(shape=(size, 1))
@@ -154,7 +154,7 @@ class PSOPrimalDual:
         metric = fn_obj.copy()
         constraints = np.zeros(shape=(size, len(self.constraints)))
         population = np.hstack(
-            [population, fn_obj, constraints, lagrangian, gap, metric]
+            [population, fn_obj, constraints, lagrangian, gap, metric],
         )
         self.population = pd.DataFrame(population, columns=self.columns)
         self.lagrangian_multipliers = pd.DataFrame(
@@ -170,7 +170,7 @@ class PSOPrimalDual:
     def _calculate_constraints(self) -> None:
         for name, constraint in self.constraints.items():
             constraint_values: pd.Series = constraint(
-                self.population.loc[:, self.variables]
+                self.population.loc[:, self.variables],
             )
             pen = 10000 if "demand" in name else 1
             self.population.loc[:, name] = pen * constraint_values
@@ -242,7 +242,6 @@ class PSOPrimalDual:
             self.population.loc[:, self.variables].to_numpy(),
         )
         self.lagrangian_velocity = np.zeros_like(self.lagrangian_multipliers.to_numpy())
-        return
 
     def _get_p_best(self) -> None:
         # Current population metric
@@ -298,7 +297,7 @@ class PSOPrimalDual:
 
         cols = [col for col in self.lagrangian_multipliers.columns if "u" in col]
         self.lagrangian_multipliers.loc[:, cols] = self.lagrangian_multipliers.loc[
-            :, cols
+            :, cols,
         ].clip(0.0)
 
     def update(self, t: int) -> None:

@@ -1,8 +1,8 @@
-from saddle.functions.benchmarks import f1
 import matplotlib.pyplot as plt
 from saddle.algorithms.meta.pso import ParticleSwarmOptimizer
-from saddle.functions.visualization.visualization import plot_mesh, plot_contour
+from saddle.functions.benchmarks import f1
 from saddle.functions.visualization.algorithms import plot_pso_search
+from saddle.functions.visualization.visualization import plot_contour, plot_mesh
 
 if __name__ == "__main__":
     low = [0.0, 0.0]

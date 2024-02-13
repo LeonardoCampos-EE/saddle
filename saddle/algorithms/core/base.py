@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from collections.abc import Callable
+
 import numpy as np
 import pandas as pd
 
-from saddle.core.types import ArrayLike
 from saddle.core.parametric_function import ParametricFunction
+from saddle.core.types import ArrayLike
 from saddle.functions.converters import convert_bounds_to_series
 
 
@@ -38,15 +39,13 @@ class BaseOptimizer(ABC):
 
     @abstractmethod
     def update(self, *args, **kwargs) -> None:
-        """
-        Updates the algorithm's position on each iteration
+        """Updates the algorithm's position on each iteration
         """
         raise NotImplementedError
 
     @abstractmethod
     def optimize(self) -> None:
-        """
-        Optimization main loop
+        """Optimization main loop
         """
         raise NotImplementedError
 
@@ -85,19 +84,18 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
                     for name in constraints
                 }
         super().__init__(
-            variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints
+            variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints,
         )
         self.populate(self.size)
 
     def populate(self, size: int) -> None:
-        """
-        Initialize the population
+        """Initialize the population
         """
         self.size = size
         upp = self.upper_bounds.to_numpy()
         low = self.lower_bounds.to_numpy()
         population: np.ndarray = (upp - low) * np.random.uniform(
-            size=(size, len(self.variables))
+            size=(size, len(self.variables)),
         ) + low
 
         fn_obj = np.zeros(shape=(size, 1))
@@ -117,13 +115,12 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
     def _calculate_constraints(self, t: int) -> None:
         for name, constraint in self.constraints.items():
             constraint_values: pd.Series = constraint(
-                self.population.loc[:, self.variables]
+                self.population.loc[:, self.variables],
             )
             self.population.loc[:, name] = self.penalties[name][t] * constraint_values
 
     def _divide_by_penalties(self, t: int) -> None:
-        """
-        This function divides the constraints by the penalty value to keep the real
+        """This function divides the constraints by the penalty value to keep the real
         constraint value in the history
         """
         for name in self.constraints:
@@ -135,7 +132,7 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
         self._calculate_fn_obj()
         self._calculate_constraints(t=t)
         metric = self.population.loc[:, ["fn_obj"] + list(self.constraints.keys())].sum(
-            axis=1
+            axis=1,
         )
         self.population.loc[:, "metric"] = metric
         self._divide_by_penalties(t=t)

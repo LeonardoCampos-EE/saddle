@@ -1,6 +1,7 @@
-from saddle.core.types import ArrayLike
 import numpy as np
 import pandas as pd
+
+from saddle.core.types import ArrayLike
 
 
 def convert_to_series(obj: ArrayLike) -> pd.Series:

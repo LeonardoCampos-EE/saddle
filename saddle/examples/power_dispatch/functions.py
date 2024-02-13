@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
@@ -15,7 +15,7 @@ def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
         np.sum(
             _cost,
             axis=0,
-        )
+        ),
     )
 
 
