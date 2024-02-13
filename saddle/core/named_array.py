@@ -13,7 +13,8 @@ class NamedArray:
         self.arr = arr
 
     def __getitem__(
-        self, key: str | int | tuple[str, int] | tuple[int, int],
+        self,
+        key: str | int | tuple[str, int] | tuple[int, int],
     ) -> npt.NDArray[np.float64]:
         if isinstance(key, str):
             if key not in self.names:

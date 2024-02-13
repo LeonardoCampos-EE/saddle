@@ -73,7 +73,11 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             self.update(alpha, beta, delta, t)
 
     def update(
-        self, alpha: np.ndarray, beta: np.ndarray, delta: np.ndarray, t: int,
+        self,
+        alpha: np.ndarray,
+        beta: np.ndarray,
+        delta: np.ndarray,
+        t: int,
     ) -> None:
         # Calculate D_alpha, D_beta, D_delta
         population = self.population.loc[:, self.variables]
@@ -92,6 +96,8 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
 
         # if not self.constraints:
         population = clip_dataframe(
-            population, upper=self.upper_bounds, lower=self.lower_bounds,
+            population,
+            upper=self.upper_bounds,
+            lower=self.lower_bounds,
         )
         self.population.loc[:, self.variables] = population

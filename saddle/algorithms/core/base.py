@@ -39,14 +39,12 @@ class BaseOptimizer(ABC):
 
     @abstractmethod
     def update(self, *args, **kwargs) -> None:
-        """Updates the algorithm's position on each iteration
-        """
+        """Updates the algorithm's position on each iteration"""
         raise NotImplementedError
 
     @abstractmethod
     def optimize(self) -> None:
-        """Optimization main loop
-        """
+        """Optimization main loop"""
         raise NotImplementedError
 
 
@@ -84,13 +82,17 @@ class BaseMetaheuristicOptimizer(BaseOptimizer):
                     for name in constraints
                 }
         super().__init__(
-            variables, upper_bounds, lower_bounds, iterations, fn_obj, constraints,
+            variables,
+            upper_bounds,
+            lower_bounds,
+            iterations,
+            fn_obj,
+            constraints,
         )
         self.populate(self.size)
 
     def populate(self, size: int) -> None:
-        """Initialize the population
-        """
+        """Initialize the population"""
         self.size = size
         upp = self.upper_bounds.to_numpy()
         low = self.lower_bounds.to_numpy()

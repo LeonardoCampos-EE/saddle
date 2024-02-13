@@ -24,5 +24,5 @@ def init_random_array(
         raise ValueError("Shape must have the same length as bounds")
 
     return (upper_bounds.arr - lower_bounds.arr) * np.random.uniform(
-        size=shape
+        size=shape,
     ) + lower_bounds.arr

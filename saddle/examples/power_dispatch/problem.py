@@ -28,13 +28,16 @@ class DispatchProblem:
     def __init__(self) -> None:
         self.fn_obj = ParametricFunction(func=cost, params=self.params)
         self.demand_constraint = ParametricFunction(
-            func=demand_constraint, demand=self.demand,
+            func=demand_constraint,
+            demand=self.demand,
         )
         self.min_power_constraint = ParametricFunction(
-            func=min_power_constraint, params=self.params,
+            func=min_power_constraint,
+            params=self.params,
         )
         self.max_power_constraint = ParametricFunction(
-            func=max_power_constraint, params=self.params,
+            func=max_power_constraint,
+            params=self.params,
         )
         self.constraints = {
             "demand_constraint": self.demand_constraint,

@@ -28,7 +28,9 @@ def cost(pop: pd.DataFrame, params: pd.DataFrame) -> pd.Series:
 
 
 def demand_constraint(
-    pop: pd.DataFrame, multipliers: pd.DataFrame, demand: float,
+    pop: pd.DataFrame,
+    multipliers: pd.DataFrame,
+    demand: float,
 ) -> pd.Series:
     p = pop.values
     v = multipliers["v"].values
@@ -36,7 +38,9 @@ def demand_constraint(
 
 
 def min_power_constraint(
-    pop: pd.DataFrame, multipliers: pd.DataFrame, params: pd.DataFrame,
+    pop: pd.DataFrame,
+    multipliers: pd.DataFrame,
+    params: pd.DataFrame,
 ) -> pd.Series:
     u_cols = [col for col in multipliers.columns if "u_min" in col]
     u = multipliers[u_cols].values.T
@@ -48,7 +52,9 @@ def min_power_constraint(
 
 
 def max_power_constraint(
-    pop: pd.DataFrame, multipliers: pd.DataFrame, params: pd.DataFrame,
+    pop: pd.DataFrame,
+    multipliers: pd.DataFrame,
+    params: pd.DataFrame,
 ) -> pd.Series:
     u_cols = [col for col in multipliers.columns if "u_max" in col]
     u = multipliers[u_cols].values.T
@@ -297,7 +303,8 @@ class PSOPrimalDual:
 
         cols = [col for col in self.lagrangian_multipliers.columns if "u" in col]
         self.lagrangian_multipliers.loc[:, cols] = self.lagrangian_multipliers.loc[
-            :, cols,
+            :,
+            cols,
         ].clip(0.0)
 
     def update(self, t: int) -> None:
