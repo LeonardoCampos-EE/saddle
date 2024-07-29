@@ -1,4 +1,4 @@
-from ..types import ArrayLike
+from saddle.core.types import ArrayLike
 import numpy as np
 import pandas as pd
 
@@ -13,6 +13,6 @@ def convert_to_series(obj: ArrayLike) -> pd.Series:
             return pd.Series(obj)
 
 
-def convert_bounds_to_series(obj: ArrayLike, columns: list[str]) -> pd.DataFrame:
+def convert_bounds_to_series(obj: ArrayLike, columns: list[str]) -> pd.Series:
     assert len(obj) == len(columns)
     return pd.Series(obj, index=columns)

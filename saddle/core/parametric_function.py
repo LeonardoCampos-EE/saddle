@@ -1,8 +1,4 @@
-from typing import TypeVar, Callable
-import pandas as pd
-import numpy as np
-
-ArrayLike = TypeVar("ArrayLike", pd.Series, np.ndarray, list)
+from typing import Callable
 
 
 class ParametricFunction:

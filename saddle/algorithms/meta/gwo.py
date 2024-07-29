@@ -72,7 +72,7 @@ class GreyWolfOptimizer(BaseMetaheuristicOptimizer):
             self.update(alpha, beta, delta, t)
 
     def update(
-        self, alpha: pd.Series, beta: pd.Series, delta: pd.Series, t: int
+        self, alpha: np.ndarray, beta: np.ndarray, delta: np.ndarray, t: int
     ) -> None:
         # Calculate D_alpha, D_beta, D_delta
         population = self.population.loc[:, self.variables]

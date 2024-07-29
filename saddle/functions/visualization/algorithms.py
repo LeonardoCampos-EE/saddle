@@ -21,7 +21,7 @@ def plot_pso_search(alg: ParticleSwarmOptimizer, optima: list[float]) -> Figure:
         pop[:, 0],
         pop[:, 1],
         c="blue",
-        marker="o",
+        marker="o",  # type: ignore
         alpha=0.5,
         label="Population",
     )
@@ -41,7 +41,7 @@ def plot_pso_search(alg: ParticleSwarmOptimizer, optima: list[float]) -> Figure:
         x=alg.g_best_history[alg.variables[0]].iloc[0],
         y=alg.g_best_history[alg.variables[1]].iloc[0],
         c="red",
-        marker="x",
+        marker="x",  # type: ignore
         s=12,
         label="G Best",
     )
@@ -87,7 +87,7 @@ def plot_gwo_search(alg: GreyWolfOptimizer, optima: list[float]) -> Figure:
         pop[:, 0],
         pop[:, 1],
         c="blue",
-        marker="o",
+        marker="o",  # type: ignore
         alpha=0.5,
         label="Population",
     )
@@ -95,7 +95,7 @@ def plot_gwo_search(alg: GreyWolfOptimizer, optima: list[float]) -> Figure:
         x=alg.alpha_history[alg.variables[0]].iloc[0],
         y=alg.alpha_history[alg.variables[1]].iloc[0],
         c="red",
-        marker="o",
+        marker="o",  # type: ignore
         alpha=0.5,
         label="Alpha",
     )
@@ -103,7 +103,7 @@ def plot_gwo_search(alg: GreyWolfOptimizer, optima: list[float]) -> Figure:
         x=alg.beta_history[alg.variables[0]].iloc[0],
         y=alg.beta_history[alg.variables[1]].iloc[0],
         c="green",
-        marker="o",
+        marker="o",  # type: ignore
         alpha=0.5,
         label="Beta",
     )
@@ -111,7 +111,7 @@ def plot_gwo_search(alg: GreyWolfOptimizer, optima: list[float]) -> Figure:
         x=alg.delta_history[alg.variables[0]].iloc[0],
         y=alg.delta_history[alg.variables[1]].iloc[0],
         c="pink",
-        marker="o",
+        marker="o",  # type: ignore
         alpha=0.5,
         label="Delta",
     )

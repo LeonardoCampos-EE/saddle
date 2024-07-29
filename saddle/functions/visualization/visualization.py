@@ -1,3 +1,5 @@
+# type: ignore
+
 from typing import Callable
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.ticker import LinearLocator
 from matplotlib import cm
-from ...types import ParametricFunction
+from saddle.core.parametric_function import ParametricFunction
 
 
 def mesh(lower: list[float], upper: list[float]) -> np.ndarray:

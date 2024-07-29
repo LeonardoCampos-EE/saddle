@@ -1,8 +1,10 @@
 from typing import Callable
 
 
-from ..core.base import BaseMetaheuristicOptimizer
-from ...types import ArrayLike, ParametricFunction
+from saddle.algorithms.core.base import BaseMetaheuristicOptimizer
+from saddle.core.types import ArrayLike
+from saddle.core.parametric_function import ParametricFunction
+
 import numpy as np
 import pandas as pd
 
