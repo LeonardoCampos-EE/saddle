@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-from saddle.types import ParametricFunction
+from saddle.core.parametric_function import ParametricFunction
 from dataclasses import dataclass
 from .functions import (
     cost,
